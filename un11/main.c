@@ -51,10 +51,62 @@ char umap[] = {
      0, 0, 0, 0,35, 0, 0, 0        // 12
 };
 
+char fromchr[64] = { 0, };
+
+FILE* t1;
+FILE* t2;
+FILE* t3;
+FILE* t4;
+FILE* t5;
+FILE* t6;
+FILE* t7;
+FILE* t8;
+FILE* t9;
+FILE* t10;
+
 void zero(char* a)
 {
     for(int i=0;i<12;i++)
         a[i] = '0';
+}
+
+FILE* tn(char c)
+{
+    switch(c) {
+        case '-':
+            return t10;
+            break;
+        case '1':
+            return t1;
+            break;
+        case '2':
+            return t2;
+            break;
+        case '3':
+            return t3;
+            break;
+        case '4':
+            return t4;
+            break;
+        case '5':
+            return t5;
+            break;
+        case '6':
+            return t6;
+            break;
+        case '7':
+            return t7;
+            break;
+        case '8':
+            return t8;
+            break;
+        case '9':
+            return t9;
+            break;
+        default:
+            return NULL;
+            break;
+    }
 }
 
 #define SG(x) a[0]=(x); break
@@ -220,9 +272,9 @@ void sshl(char* a)
 
 // shift left extend
 // move rA digits to the corresponding rX digits
-void shle(int i)
+void shle(int j)
 {
-    rX[i] = rA[11];
+    rX[j] = rA[11];
     for(int i=11;i>=1;i--)
         rA[i] = rA[i-1];
 }
@@ -279,7 +331,7 @@ void init(void)
     rF=calloc(12,sizeof(char));
     rL=calloc(12,sizeof(char));
     
-    rW=calloc(9,sizeof(char*));
+    rW=calloc(10,sizeof(char*));
     rZ=calloc(60,sizeof(char*));
     rO=calloc(60,sizeof(char*));
     rI=calloc(60,sizeof(char*));
@@ -292,8 +344,8 @@ void init(void)
     half=calloc(12,sizeof(char));
     halfi=calloc(12,sizeof(char));
     
-    mem=calloc(1000,sizeof(char));
-    for(int i=0;i<1000;i++) {
+    mem=calloc(10000,sizeof(char));
+    for(int i=0;i<10000;i++) {
         mem[i] = calloc(12,sizeof(char));
         zero(mem[i]);
     }
@@ -322,7 +374,79 @@ void init(void)
     half[11] = '5';
     halfi[1] = '5';
     
-    CC[11] = '1';
+    t1=fopen("tape1.tp","r+");
+    t2=fopen("tape2.tp","r+");
+    t3=fopen("tape3.tp","r+");
+    t4=fopen("tape4.tp","r+");
+    t5=fopen("tape5.tp","r+");
+    t6=fopen("tape6.tp","r+");
+    t7=fopen("tape7.tp","r+");
+    t8=fopen("tape8.tp","r+");
+    t9=fopen("tape9.tp","r+");
+    t10=fopen("tape-.tp","r+");
+    
+    fromchr[0] = 'i';
+    fromchr[020] = '\r';
+    fromchr[040] = '\t';
+    fromchr[1] = ' ';
+    fromchr[021] = ',';
+    fromchr[041] = '"';
+    fromchr[2] = '-';
+    fromchr[022] = '.';
+    fromchr[042] = '|';
+    fromchr[062] = ':';
+    fromchr[3] = '0';
+    fromchr[023] = ';';
+    fromchr[043] = ')';
+    fromchr[063] = '+';
+    fromchr[4] = '1';
+    fromchr[024] = 'A';
+    fromchr[044] = 'J';
+    fromchr[064] = '/';
+    fromchr[5] = '2';
+    fromchr[025] = 'B';
+    fromchr[045] = 'K';
+    fromchr[065] = 'S';
+    fromchr[6] = '3';
+    fromchr[026] = 'C';
+    fromchr[046] = 'L';
+    fromchr[066] = 'T';
+    fromchr[7] = '4';
+    fromchr[027] = 'D';
+    fromchr[047] = 'M';
+    fromchr[067] = 'U';
+    fromchr[010] = '5';
+    fromchr[030] = 'E';
+    fromchr[050] = 'N';
+    fromchr[070] = 'V';
+    fromchr[011] = '6';
+    fromchr[031] = 'F';
+    fromchr[051] = 'O';
+    fromchr[071] = 'W';
+    fromchr[012] = '7';
+    fromchr[032] = 'G';
+    fromchr[052] = 'P';
+    fromchr[072] = 'X';
+    fromchr[013] = '8';
+    fromchr[033] = 'H';
+    fromchr[053] = 'Q';
+    fromchr[073] = 'Y';
+    fromchr[014] = '9';
+    fromchr[034] = 'I';
+    fromchr[054] = 'R';
+    fromchr[074] = 'Z';
+    fromchr[015] = 39;
+    fromchr[035] = '#';
+    fromchr[055] = '$';
+    fromchr[075] = '%';
+    fromchr[016] = '&';
+    fromchr[036] = '^';
+    fromchr[056] = '*';
+    fromchr[076] = '=';
+    fromchr[017] = '(';
+    fromchr[037] = '@';
+    fromchr[057] = '?';
+    
 }
 
 int isN(char a){
@@ -352,10 +476,10 @@ int tochr(char c)
         case 'i':
             return 0;
             break;
-        case 'r':
+        case '\r':
             return 020;
             break;
-        case 't':
+        case '\t':
             return 040;
             break;
         case ' ':
@@ -643,15 +767,18 @@ void addAX(void)
     hlt = 0;
     
     for(int i=11;i>=0;i--) {
+        t = value(rA[i]) + value(rX[i]) + c;
+        if (t > 9) {
+            t -= 10;
+            c = 1;
+        } else if (t == -1 ){
+            t = -3;
+        } else {
+            c = 0;
+        }
+        rA[i] = t + '0';
         if (isN(rA[i]) && isN(rX[i])) {
-            t = value(rA[i]) + value(rX[i]) + c;
-            if (t > 9) {
-                t -= 10;
-                c = 1;
-            } else {
-                c = 0;
-            }
-            rA[i] = t + '0';
+            // nothing
         } else if (isN(rA[i]) && isC(rX[i])) {
             rA[i] = rX[i];
         } else if (isN(rA[i]) && (rX[i] == '0')) {
@@ -667,7 +794,7 @@ void addAX(void)
         } else if (isC(rA[i]) && (rX[i] == '-')) {
             // nothing
         } else if ((rA[i] == '0') && isN(rX[i])) {
-            rA[i] = rX[i];
+            //rA[i] = rX[i];
         } else if ((rA[i] == '0') && isC(rX[i])) {
             rA[i] = rX[i];
         } else if ((rA[i] == '0') && (rX[i] == '0')) {
@@ -675,7 +802,7 @@ void addAX(void)
         } else if ((rA[i] == '0') && (rX[i] == '-')) {
             rA[i] = '-';
         } else if ((rA[i] == '-') && isN(rX[i])) {
-            rA[i] -= 1;
+            //rA[i] -= 1;
         } else if ((rA[i] == '-') && isC(rX[i])) {
             rA[i] = rX[i];
         } else if ((rA[i] == '-') && (rX[i] == '0')) {
@@ -684,10 +811,7 @@ void addAX(void)
             rA[i] = ' ';
         }
     }
-    
-    if (c == 1) {
-        zero(SR);
-    }
+    ovf = c;
 }
 
 void addAL(void)
@@ -696,15 +820,18 @@ void addAL(void)
     int c = 0;
     
     for(int i=11;i>=0;i--) {
+        t = value(rA[i]) + value(rL[i]) + c;
+        if (t > 9) {
+            t -= 10;
+            c = 1;
+        } else if (t == -1) {
+            t = -3;
+        } else {
+            c = 0;
+        }
+        rA[i] = t + '0';
         if (isN(rA[i]) && isN(rL[i])) {
-            t = value(rA[i]) + value(rL[i]) + c;
-            if (t > 9) {
-                t -= 10;
-                c = 1;
-            } else {
-                c = 0;
-            }
-            rA[i] = t + '0';
+            // nothing
         } else if (isN(rA[i]) && isC(rL[i])) {
             rA[i] = rL[i];
         } else if (isN(rA[i]) && (rL[i] == '0')) {
@@ -720,7 +847,7 @@ void addAL(void)
         } else if (isC(rA[i]) && (rL[i] == '-')) {
             // nothing
         } else if ((rA[i] == '0') && isN(rL[i])) {
-            rA[i] = rL[i];
+            //rA[i] = rL[i];
         } else if ((rA[i] == '0') && isC(rL[i])) {
             rA[i] = rL[i];
         } else if ((rA[i] == '0') && (rL[i] == '0')) {
@@ -728,7 +855,7 @@ void addAL(void)
         } else if ((rA[i] == '0') && (rL[i] == '-')) {
             rA[i] = '-';
         } else if ((rA[i] == '-') && isN(rL[i])) {
-            rA[i] -= 1;
+            //rA[i] -= 1;
         } else if ((rA[i] == '-') && isC(rL[i])) {
             rA[i] = rX[i];
         } else if ((rA[i] == '-') && (rL[i] == '0')) {
@@ -737,10 +864,7 @@ void addAL(void)
             rA[i] = ' ';
         }
     }
-    
-    if (c == 1) {
-        zero(SR);
-    }
+    ovf = c;
 }
 
 void addAF(void)
@@ -749,15 +873,18 @@ void addAF(void)
     int c = 0;
     
     for(int i=11;i>=0;i--) {
+        t = value(rA[i]) + value(rF[i]) + c;
+        if (t > 9) {
+            t -= 10;
+            c = 1;
+        } else if (t == -1) {
+            t = -3;
+        } else {
+            c = 0;
+        }
+        rA[i] = t + '0';
         if (isN(rA[i]) && isN(rF[i])) {
-            t = value(rA[i]) + value(rF[i]) + c;
-            if (t > 9) {
-                t -= 10;
-                c = 1;
-            } else {
-                c = 0;
-            }
-            rA[i] = t + '0';
+            // nothing
         } else if (isN(rA[i]) && isC(rF[i])) {
             rA[i] = rF[i];
         } else if (isN(rA[i]) && (rF[i] == '0')) {
@@ -773,15 +900,15 @@ void addAF(void)
         } else if (isC(rA[i]) && (rF[i] == '-')) {
             // nothing
         } else if ((rA[i] == '0') && isN(rF[i])) {
-            rA[i] = rF[i];
+            //rA[i] = rF[i];
         } else if ((rA[i] == '0') && isC(rF[i])) {
             rA[i] = rF[i];
         } else if ((rA[i] == '0') && (rF[i] == '0')) {
             // nothing
         } else if ((rA[i] == '0') && (rF[i] == '-')) {
-            rA[i] = '-';
+            //rA[i] = '-';
         } else if ((rA[i] == '-') && isN(rF[i])) {
-            rA[i] -= 1;
+            //rA[i] -= 1;
         } else if ((rA[i] == '-') && isC(rF[i])) {
             rA[i] = rF[i];
         } else if ((rA[i] == '-') && (rF[i] == '0')) {
@@ -791,9 +918,7 @@ void addAF(void)
         }
     }
     
-    if (c == 1) {
-        zero(SR);
-    }
+    ovf = c;
 }
 
 void addn(char* n)
@@ -802,15 +927,18 @@ void addn(char* n)
     int c = 0;
     
     for(int i=11;i>=0;i--) {
+        t = value(rA[i]) + value(n[i]) + c;
+        if (t > 9) {
+            t -= 10;
+            c = 1;
+        } else if (t == -1) {
+            t = -3;
+        } else {
+            c = 0;
+        }
+        rA[i] = t + '0';
         if (isN(rA[i]) && isN(n[i])) {
-            t = value(rA[i]) + value(n[i]) + c;
-            if (t > 9) {
-                t -= 10;
-                c = 1;
-            } else {
-                c = 0;
-            }
-            rA[i] = t + '0';
+            //nothing
         } else if (isN(rA[i]) && isC(n[i])) {
             rA[i] = n[i];
         } else if (isN(rA[i]) && (n[i] == '0')) {
@@ -826,15 +954,15 @@ void addn(char* n)
         } else if (isC(rA[i]) && (n[i] == '-')) {
             // nothing
         } else if ((rA[i] == '0') && isN(n[i])) {
-            rA[i] = n[i];
+            //rA[i] = n[i];
         } else if ((rA[i] == '0') && isC(n[i])) {
             rA[i] = n[i];
         } else if ((rA[i] == '0') && (n[i] == '0')) {
             // nothing
         } else if ((rA[i] == '0') && (n[i] == '-')) {
-            rA[i] = '-';
+            //rA[i] = '-';
         } else if ((rA[i] == '-') && isN(n[i])) {
-            rA[i] -= 1;
+            //rA[i] -= 1;
         } else if ((rA[i] == '-') && isC(n[i])) {
             rA[i] = n[i];
         } else if ((rA[i] == '-') && (n[i] == '0')) {
@@ -843,10 +971,7 @@ void addn(char* n)
             rA[i] = ' ';
         }
     }
-    
-    if (c == 1) {
-        zero(SR);
-    }
+    ovf = c;
 }
 
 void addnn(char* d, char* n)
@@ -855,15 +980,16 @@ void addnn(char* d, char* n)
     int c = 0;
     
     for(int i=11;i>=0;i--) {
+        t = value(d[i]) + value(n[i]) + c;
+        if (t > 9) {
+            t -= 10;
+            c = 1;
+        } else {
+            c = 0;
+        }
+        d[i] = t + '0';
         if (isN(d[i]) && isN(n[i])) {
-            t = value(d[i]) + value(n[i]) + c;
-            if (t > 9) {
-                t -= 10;
-                c = 1;
-            } else {
-                c = 0;
-            }
-            d[i] = t + '0';
+            // nothing
         } else if (isN(d[i]) && isC(n[i])) {
             d[i] = n[i];
         } else if (isN(d[i]) && (n[i] == '0')) {
@@ -879,15 +1005,15 @@ void addnn(char* d, char* n)
         } else if (isC(d[i]) && (n[i] == '-')) {
             // nothing
         } else if ((d[i] == '0') && isN(n[i])) {
-            d[i] = n[i];
+            //d[i] = n[i];
         } else if ((d[i] == '0') && isC(n[i])) {
             d[i] = n[i];
         } else if ((d[i] == '0') && (n[i] == '0')) {
             // nothing
         } else if ((d[i] == '0') && (n[i] == '-')) {
-            d[i] = '-';
+            // d[i] = '-';
         } else if ((d[i] == '-') && isN(n[i])) {
-            d[i] -= 1;
+            //d[i] -= 1;
         } else if ((d[i] == '-') && isC(n[i])) {
             d[i] = n[i];
         } else if ((d[i] == '-') && (n[i] == '0')) {
@@ -904,15 +1030,16 @@ void subAX(void)
     int c = 0;
     
     for(int i=11;i>=0;i--) {
+        t = value(rA[i]) - value(rX[i]) - c;
+        if (t < 0) {
+            t = 10 - abs(t);
+            c = 1;
+        } else {
+            c = 0;
+        }
+        rA[i] = t + '0';
         if (isN(rA[i]) && isN(rX[i])) {
-            t = (rA[i]-'0') - (rX[i] - '0') - c;
-            if (t < 0) {
-                t = 10 - abs(t);
-                c = 1;
-            } else {
-                c = 0;
-            }
-            rA[i] = t + '0';
+            // nothing
         } else if (isN(rA[i]) && isC(rX[i])) {
             rA[i] = rX[i];
         } else if (isN(rA[i]) && (rX[i] == '0')) {
@@ -928,7 +1055,7 @@ void subAX(void)
         } else if (isC(rA[i]) && (rX[i] == '-')) {
             // nothing
         } else if ((rA[i] == '0') && isN(rX[i])) {
-            rA[i] = rX[i];
+            //rA[i] = rX[i];
         } else if ((rA[i] == '0') && isC(rX[i])) {
             rA[i] = rX[i];
         } else if ((rA[i] == '0') && (rX[i] == '0')) {
@@ -936,7 +1063,7 @@ void subAX(void)
         } else if ((rA[i] == '0') && (rX[i] == '-')) {
             rA[i] = '-';
         } else if ((rA[i] == '-') && isN(rX[i])) {
-            rA[i] -= 1;
+            //rA[i] -= 1;
         } else if ((rA[i] == '-') && isC(rX[i])) {
             rA[i] = rX[i];
         } else if ((rA[i] == '-') && (rX[i] == '0')) {
@@ -953,15 +1080,16 @@ void subAL(void)
     int c = 0;
     
     for(int i=11;i>=0;i--) {
+        t = value(rA[i]) - value(rL[i]) - c;
+        if (t < 0) {
+            t = 10 - abs(t);
+            c = 1;
+        } else {
+            c = 0;
+        }
+        rA[i] = t + '0';
         if (isN(rA[i]) && isN(rL[i])) {
-            t = (rA[i]-'0') - (rL[i] - '0') - c;
-            if (t < 0) {
-                t = 10 - abs(t);
-                c = 1;
-            } else {
-                c = 0;
-            }
-            rA[i] = t + '0';
+            // nothing
         } else if (isN(rA[i]) && isC(rL[i])) {
             rA[i] = rL[i];
         } else if (isN(rA[i]) && (rL[i] == '0')) {
@@ -977,7 +1105,7 @@ void subAL(void)
         } else if (isC(rA[i]) && (rL[i] == '-')) {
             // nothing
         } else if ((rA[i] == '0') && isN(rL[i])) {
-            rA[i] = rL[i];
+            //rA[i] = rL[i];
         } else if ((rA[i] == '0') && isC(rL[i])) {
             rA[i] = rL[i];
         } else if ((rA[i] == '0') && (rL[i] == '0')) {
@@ -985,7 +1113,7 @@ void subAL(void)
         } else if ((rA[i] == '0') && (rL[i] == '-')) {
             rA[i] = '-';
         } else if ((rA[i] == '-') && isN(rL[i])) {
-            rA[i] -= 1;
+            //rA[i] -= 1;
         } else if ((rA[i] == '-') && isC(rL[i])) {
             rA[i] = rL[i];
         } else if ((rA[i] == '-') && (rL[i] == '0')) {
@@ -998,7 +1126,7 @@ void subAL(void)
 
 void roundd(void)
 {
-    addnn(rX,half);
+    addnn(rX,halfi);
     if (rX[0] == '1')
         addn(one);
 }
@@ -1009,7 +1137,7 @@ void mul(char sgn)
     
     zero(rA);
     if ((rL[0] == '&') || (rL[0] == 39) || (rL[0] == '(')) {
-        zero(SR);
+        ovf = 1;
         // overflow
     }
     addAL(); addAL(); addAL();
@@ -1211,7 +1339,7 @@ void S0(void)
         addAX();
         if (rA[0] != '0') {
             // overflow into sign position
-            zero(SR);
+            ovf = 1;
             shr(rA);
         }
         rA[0] = sgn;
@@ -1247,7 +1375,7 @@ void S0(void)
         addAX();
         if (rA[0] != '0') {
             // overflow into sign position
-            zero(SR);
+            ovf = 1;
             shr(rA);
         }
         rA[0] = sgn;
@@ -1264,7 +1392,7 @@ void S0(void)
         }
         if (rA[0] != '0') {
             // overflow into sign position
-            zero(SR);
+            ovf = 1;
             shr(rA);
         }
         rA[0] = sgn;
@@ -1353,7 +1481,7 @@ void A0(void)
         }
         if (rA[0] != '0') {
             // overflow into sign position
-            zero(SR);
+            ovf = 1;
             shr(rA);
         }
         rA[0] = sgn;
@@ -1379,7 +1507,7 @@ void A0(void)
         }
         if (rA[0] != '0') {
             // overflow into sign position
-            zero(SR);
+            ovf = 1;
             shr(rA);
         }
         rA[0] = sgn;
@@ -1394,7 +1522,7 @@ void A0(void)
         addAX();
         if (rA[0] != '0') {
             // overflow into sign position
-            zero(SR);
+            ovf = 1;
             shr(rA);
         }
         rA[0] = sgn;
@@ -1489,7 +1617,7 @@ void X0(void)
 }
 */
 
-void dump(void)
+void dump(int t)
 {
     printf("rA ");
     for(int i=0;i<12;i++)
@@ -1501,12 +1629,29 @@ void dump(void)
         printf("%c",rX[i]);
     printf("\n");
     
-    for(int i=0;i<1000;i++) {
-        printf("[%03d]\t",i);
-        for(int j=0;j<12;j++) {
-            printf("%c",mem[i][j]);
+    printf("rL ");
+    for(int i=0;i<12;i++)
+        printf("%c",rL[i]);
+    printf("\n");
+    
+    printf("rF ");
+    for(int i=0;i<12;i++)
+        printf("%c",rF[i]);
+    printf("\n");
+    
+    printf("CC ");
+    for(int i=0;i<12;i++)
+        printf("%c",CC[i]);
+    printf("\n");
+    
+    if (t == 1) {
+        for(int i=0;i<100;i++) {
+            printf("[%03d]\t",i);
+            for(int j=0;j<12;j++) {
+                printf("%c",mem[i][j]);
+            }
+            printf("\n");
         }
-        printf("\n");
     }
 }
 
@@ -1515,8 +1660,9 @@ void ex(void)
     int ad;
     int d;
     int cells;
+    int ilock[58] = { 0, };
     
-    ad = (SR[3]-'0')*100 + (SR[4]-'0')*10 + (SR[5]-'0');
+    ad = (SR[2]-'0')*1000 + (SR[3]-'0')*100 + (SR[4]-'0')*10 + (SR[5]-'0');
     d = SR[1];
     cells = d - '0';
     
@@ -1611,9 +1757,116 @@ void ex(void)
                 S0();
             }
             break;
+        case '0':
+            if (SR[1] != '0') {
+                for (int i=0;i<d-'0';i++)
+                    sshl(rA);
+            }
+            break;
+        case '1':
+            if (d == '0') {
+                for(int i=0;i<12;i++)
+                    printf("%c",mem[ad][i]);
+            } else {
+                if (ilock[d] != 1) {
+                    for(int i=0;i<60;i++) {
+                        for(int j=0;j<12;j++) {
+                            rI[i][j]=fgetc(tn(d));
+                        }
+                    }
+                } else {
+                    hlt = d;
+                }
+            }
+            break;
+        case '2':
+            if (d != '0') {
+                if (ilock[d] != 1) {
+                    for(int i=59;i>=0;i--) {
+                        for(int j=0;j<12;j++) {
+                            rI[i][j]=fgetc(tn(d));
+                        }
+                    }
+                } else {
+                    hlt = d;
+                }
+            }
+            break;
+        case '3':
+            if (d == '0') {
+                for(int i=0;i<59;i++) {
+                    for(int j=0;j<12;j++)
+                        mem[ad+i][j]=rI[i][j];
+                }
+            } else {
+                for(int i=0;i<59;i++) {
+                    for(int j=0;j<12;j++)
+                        mem[ad+i][j]=rI[i][j];
+                }
+                if (ilock[d] != 1) {
+                    for(int i=0;i<60;i++) {
+                        for(int j=0;j<12;j++) {
+                            rI[i][j]=fgetc(tn(d));
+                        }
+                    }
+                } else {
+                    hlt = d;
+                }
+            }
+            break;
+        case '4':
+            if (d == '0') {
+                for(int i=0;i<59;i++) {
+                    for(int j=0;j<12;j++)
+                        mem[ad+i][j]=rI[i][j];
+                }
+            } else {
+                for(int i=0;i<59;i++) {
+                    for(int j=0;j<12;j++)
+                        mem[ad+i][j]=rI[i][j];
+                }
+                if(ilock[d] != 1) {
+                    for(int i=59;i>=0;i--) {
+                        for(int j=0;j<12;j++) {
+                            rI[i][j]=fgetc(tn(d));
+                        }
+                    }
+                } else {
+                    hlt = d;
+                }
+            }
+            break;
         case '5':
-            for(int i=0;i<12;i++)
-                printf("%c",mem[ad][i]);
+            if (d == '0') {
+                for(int i=0;i<12;i++)
+                    printf("%c",mem[ad][i]);
+            } else {
+                if (ilock[d] != 1) {
+                    for(int i=0;i<60;i++) {
+                        for(int j=0;j<12;j++)
+                            fputc(mem[ad+i][j],tn(d));
+                    }
+                } else {
+                    hlt = d;
+                }
+            }
+            break;
+        case '6':
+            rewind(tn(d));
+            break;
+        case '7':
+            if (ilock[d] != 1) {
+                for(int i=0;i<60;i++) {
+                    for(int j=0;j<12;j++)
+                        fputc(mem[ad+i][j],tn(d));
+                }
+            } else {
+                hlt = d;
+            }
+            break;
+        case '8':
+            rewind(tn(d));
+            ilock[d] = 1;
             break;
         case '9':
             hlt = 1;
@@ -1684,12 +1937,6 @@ void ex(void)
             for(int i=2;i<6;i++)
                 CC[i] = CR[i];
             break;
-        case 'O':
-            if (SR[1] != '0') {
-                for (int i=0;i<d-'0';i++)
-                    sshl(rA);
-            }
-            break;
         case '-':
             for (int i=0;i<d-'0';i++)
                 sshr(rA);
@@ -1738,24 +1985,30 @@ void ex(void)
         case 'R':
             for(int i=0;i<6;i++)
                 mem[ad][i] = '0';
-            mem[ad][6] = 'U'; mem[ad][7] = '0';
+            mem[ad][6] = 'U';
+            mem[ad][7] = '0';
             for(int i=2;i<6;i++)
                 mem[ad][6+i] = CC[i];
             break;
     }
 }
 
-void _alpha(void)
-{
-    for(int i=0;i<6;i++)
-        SR[i] = CC[6+i];
-}
-
 void _beta(void)
 {
     int ad = 0;
     
-    ad = (SR[2]-'0')*1000 + (SR[3]-'0')*100 + (SR[4]-'0')*10 + (SR[5]-'0');
+    if (ovf == 0) {
+        for(int i=0;i<6;i++)
+            SR[i] = CC[6+i];
+        ad = (SR[2]-'0')*1000 + (SR[3]-'0')*100 + (SR[4]-'0')*10 + (SR[5]-'0');
+    } else {
+        printf("OVF at CC: ");
+        for(int i=0;i<12;i++)
+            printf("%c",CC[i]);
+        printf("\n");
+        zero(SR);
+        ovf = 0;
+    }
     
     for(int i=0;i<12;i++)
         CR[i] = mem[ad][i];
@@ -1780,42 +2033,46 @@ void _delta(void)
 void microcode(void)
 {
     while(hlt == 0) {
-        if (ovf == 0) {
-            _alpha();
             _beta();
             _gamma();
             _delta();
-        } else {
-            _ao();
-            _bo();
-            _go();
-            _do();
-            ovf = 0;
-        }
     }
-    printf("HLT: %d\n", hlt);
+    printf("\nHLT: %d\n", hlt);
+}
+
+void closetape(void) {
+    if (t1 != NULL)
+        fclose(t1);
+    if (t2 != NULL)
+        fclose(t2);
+    if (t3 != NULL)
+        fclose(t3);
+    if (t4 != NULL)
+        fclose(t4);
+    if (t5 != NULL)
+        fclose(t5);
+    if (t6 != NULL)
+        fclose(t6);
+    if (t7 != NULL)
+        fclose(t7);
+    if (t8 != NULL)
+        fclose(t8);
+    if (t9 != NULL)
+        fclose(t9);
+    if (t10 != NULL)
+        fclose(t10);
 }
 
 int main(int argc, const char * argv[]) {
     init();
     
-    /* set(rL,11111111111);
-    set(mem[300],1371742100);*/
-    
-    /*set(rL,90000000001);
-    set(mem[300],90000000001);*/
-    
-    /*set(rA,445);
-    set(mem[300],500);*/
-    
-    cpy(mem[100],"012345678997");
-    cpy(mem[101],"0&3442211554");
-    cpy(mem[1],  "B00100A00101");
-    cpy(mem[2],  "H00110900000");
+#include "config.h"
     
     microcode();
     
-    dump();
+    closetape();
+    
+    dump(0);
     
     return 0;
 }
