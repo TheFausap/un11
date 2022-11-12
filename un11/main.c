@@ -10,6 +10,9 @@
 #include <math.h>
 #include <ctype.h>
 
+#define S(x,v) cpy(mem[(x)],#v)
+#define O(x) set(CR,(x))
+
 char* rA;
 char* rX;
 char* rF;
@@ -1645,7 +1648,7 @@ void dump(int t)
     printf("\n");
     
     if (t == 1) {
-        for(int i=0;i<100;i++) {
+        for(int i=0;i<10000;i++) {
             printf("[%03d]\t",i);
             for(int j=0;j<12;j++) {
                 printf("%c",mem[i][j]);
@@ -1887,7 +1890,7 @@ void ex(void)
                 cpy(rX,mem[ad]);
             }
             break;
-        case'K':
+        case 'K':
             cpy(rL,rA);
             zero(rA);
             break;
@@ -1935,7 +1938,7 @@ void ex(void)
             break;
         case 'U':
             for(int i=2;i<6;i++)
-                CC[i] = CR[i];
+                CC[6+i] = SR[i];
             break;
         case '-':
             for (int i=0;i<d-'0';i++)
@@ -1952,7 +1955,7 @@ void ex(void)
             if (cmp(rA,rL) == 0) {
                 // U0
                 for(int i=2;i<6;i++)
-                    CC[i] = CR[i];
+                    CC[6+i] = SR[i];
                 break;
             }
             break;
@@ -1960,7 +1963,7 @@ void ex(void)
             if (cmp(rA,rL) == 1) {
                 // U0
                 for(int i=2;i<6;i++)
-                    CC[i] = CR[i];
+                    CC[6+i] = SR[i];
                 break;
             }
             break;
@@ -2072,7 +2075,7 @@ int main(int argc, const char * argv[]) {
     
     closetape();
     
-    dump(0);
+    dump(1);
     
     return 0;
 }
