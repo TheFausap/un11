@@ -10,8 +10,7 @@
 #include <math.h>
 #include <ctype.h>
 
-#define S(x,v) cpy(mem[(x)],#v)
-#define O(x) set(CR,(x))
+#define check(x) if((x) == NULL){printf("Alloc error %s\n",#x);exit(100);}
 
 char* rA;
 char* rX;
@@ -69,8 +68,8 @@ FILE* t10;
 
 void zero(char* a)
 {
-    for(int i=0;i<12;i++)
-        a[i] = '0';
+    for(int _i=0;_i<12;_i++)
+        a[_i] = '0';
 }
 
 FILE* tn(char c)
@@ -329,39 +328,40 @@ void cpl(char* a)
 
 void init(void)
 {
-    rA=calloc(12,sizeof(char));
-    rX=calloc(12,sizeof(char));
-    rF=calloc(12,sizeof(char));
-    rL=calloc(12,sizeof(char));
+    rA = (char*)calloc(12, sizeof(char)); check(rA);
+    rX = (char*)calloc(12, sizeof(char)); check(rX);
+    rF = (char*)calloc(12, sizeof(char)); check(rF);
+    rL = (char*)calloc(12, sizeof(char)); check(rL);
     
-    rW=calloc(10,sizeof(char*));
-    rZ=calloc(60,sizeof(char*));
-    rO=calloc(60,sizeof(char*));
-    rI=calloc(60,sizeof(char*));
+    rW = (char**)calloc(10, sizeof(char*)); check(rW);
+    rZ = (char**)calloc(60, sizeof(char*)); check(rZ);
+    rO = (char**)calloc(60, sizeof(char*)); check(rO);
+    rI = (char**)calloc(60, sizeof(char*)); check(rI);
     
-    CC=calloc(12,sizeof(char));
-    CR=calloc(12,sizeof(char));
-    SR=calloc(6,sizeof(char));
+    CC = (char*)calloc(12, sizeof(char)); check(CC);
+    CR = (char*)calloc(12, sizeof(char)); check(CR);
+    SR = (char*)calloc(6, sizeof(char)); check(SR);
     
-    one=calloc(12,sizeof(char));
-    half=calloc(12,sizeof(char));
-    halfi=calloc(12,sizeof(char));
+    one = (char*)calloc(12, sizeof(char)); check(one);
+    half = (char*)calloc(12, sizeof(char)); check(half);
+    halfi = (char*)calloc(12, sizeof(char)); check(halfi);
     
-    mem=calloc(10000,sizeof(char));
+    mem = (char**)calloc(10000, sizeof(char*)); check(mem);
+
     for(int i=0;i<10000;i++) {
-        mem[i] = calloc(12,sizeof(char));
+        mem[i] = (char*)calloc(12,sizeof(char));
         zero(mem[i]);
     }
     
     for(int i=0;i<9;i++) {
-        rW[i] = calloc(12,sizeof(char));
+        rW[i] = (char*)calloc(12,sizeof(char));
         zero(rW[i]);
     }
     
     for(int i=0;i<60;i++) {
-        rZ[i] = calloc(12,sizeof(char));
-        rO[i] = calloc(12,sizeof(char));
-        rI[i] = calloc(12,sizeof(char));
+        rZ[i] = (char*)calloc(12,sizeof(char));
+        rO[i] = (char*)calloc(12,sizeof(char));
+        rI[i] = (char*)calloc(12,sizeof(char));
         zero(rZ[i]); zero(rO[i]);
         zero(rI[i]);
     }
@@ -1622,6 +1622,8 @@ void X0(void)
 
 void dump(int t)
 {
+    printf("Dumping registries...\n");
+
     printf("rA ");
     for(int i=0;i<12;i++)
         printf("%c",rA[i]);
@@ -1648,10 +1650,19 @@ void dump(int t)
     printf("\n");
     
     if (t == 1) {
-        for(int i=0;i<10000;i++) {
-            printf("[%03d]\t",i);
+        for(int i=0;i<2000;i++) {
+            printf("[%04d]\t",i);
             for(int j=0;j<12;j++) {
                 printf("%c",mem[i][j]);
+            }
+            printf("\n");
+        }
+    }
+    else if (t == 2) {
+        for (int i = 0; i < 10000; i++) {
+            printf("[%04d]\t", i);
+            for (int j = 0; j < 12; j++) {
+                printf("%c", mem[i][j]);
             }
             printf("\n");
         }
@@ -1714,6 +1725,7 @@ void ex(void)
                         rA[i] = mem[ad][i];
                     }
                 }
+                cpy(mem[ad], rA);
             }
             break;
         case 'A':
@@ -1991,7 +2003,7 @@ void ex(void)
             mem[ad][6] = 'U';
             mem[ad][7] = '0';
             for(int i=2;i<6;i++)
-                mem[ad][6+i] = CC[i];
+                mem[ad][6+i] = CC[6+i];
             break;
     }
 }
@@ -2040,7 +2052,7 @@ void microcode(void)
             _gamma();
             _delta();
     }
-    printf("\nHLT: %d\n", hlt);
+    printf("\nHLT: RC%d\n", hlt-1);
 }
 
 void closetape(void) {
@@ -2075,7 +2087,7 @@ int main(int argc, const char * argv[]) {
     
     closetape();
     
-    dump(1);
+    dump(0);
     
     return 0;
 }
